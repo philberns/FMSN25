@@ -14,7 +14,7 @@ def american_put_derivate(S0, K, r, T, N, sigma):
             price = S0 * (u ** (j)) * (d ** (i-j))
             stock_tree[j][i]=(price)
 
-# --- Step 2: initialize option values at maturity and step back in the payoff tree ---
+# --- Step 2: initialize option values at maturity and step back in the payoff tree and determine whether the continual or exercise option is preferable ---
     payoff_tree = np.zeros((N+1,N+1))
     terminal_prices = stock_tree[:,-1]
     terminal_values = [max(K -price, 0) for price in terminal_prices]
@@ -25,10 +25,6 @@ def american_put_derivate(S0, K, r, T, N, sigma):
             cont_value=disc*(qu*payoff_tree[j+1,i+1]+qd*payoff_tree[j,i+1])
             exercise_value = max(K - stock_tree[j,i],0)
             payoff_tree[j, i]=max(cont_value, exercise_value)            
-
-
-    #rnvf = np.power(disc,3)*(np.power(qu,3)*terminal_values[0] + 3*np.power(qd,2)*qu*terminal_values[1] + 3*np.power(qu,2)*qd*terminal_values[2] + np.power(qu,3)*terminal_values[3])
-
     
     return payoff_tree[0,0]  # option value today
 
