@@ -1,12 +1,13 @@
 import numpy as np
 import math
+import european_call as euro
 def american_put_derivate(S0, K, r, T, N, sigma):
     delta = T/N
     u = np.exp(sigma*np.sqrt(delta))
     d = np.exp(-sigma*np.sqrt(delta))
     disc = math.exp(-r * delta)
-    qu = (np.exp(-r * T) -d)/(u - d)
-    qd = (u - np.exp(-r * T))/(u - d)
+    qu = (np.exp(r * delta) -d)/(u - d)
+    qd = (u - np.exp(r * delta))/(u - d)
     # --- Step 1: build stock price tree ---
     stock_tree = np.zeros((N+1,N+1))
     for i in range(N + 1):
@@ -35,7 +36,12 @@ r = 0.05   # risk-free rate
 T = 1      # time to maturity (1 year)
 N = [1,3,10]      # steps
 sigma = 0.2
+american_put_price = []
 for i in N:
-    price = american_put_derivate(S0, K, r, T, i, sigma)
-    print(f"American put price with {i} steps: {price:.4f}")
-
+    american_put_price.append(american_put_derivate(S0, K, r, T, i, sigma))
+    print(f"American put price with {i} steps: {american_put_derivate(S0, K, r, T, i, sigma):.4f}")
+forward_price = S0 - K * math.exp(-r * T)
+euro_call_price = euro.european_call_binomial(S0, K, r, T, 3, sigma)[0]
+price_delta = euro_call_price-american_put_price[1]
+print(f"Verify the put-call parity inequality at 0: {S0-K, price_delta,forward_price}")
+  
