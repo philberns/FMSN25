@@ -29,7 +29,7 @@ def european_call_binomial(S0, K, r, T, N, sigma):
     for i in range(N-1,-1,-1):
         for j in range(i,-1,-1):
             payoff_tree[j, i]=disc*(qu*payoff_tree[j+1,i+1]+qd*payoff_tree[j,i+1])
-    print(payoff_tree)
+
 
     rnvf = np.power(disc,N)*np.sum([math.comb(N, k) * (qu ** k) * (qd ** (N - k)) * terminal_values[k] for k in range(N + 1)])
     #rnvf = np.power(disc,N)*(np.power(qu,N)*terminal_values[0] + N*np.power(qd,N-1)*qu*terminal_values[1] + N*np.power(qu,N-1)*qd*terminal_values[N-1] + np.power(qu,N)*terminal_values[3])
