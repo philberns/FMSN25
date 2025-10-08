@@ -24,6 +24,4 @@ for i in K:
     price_geo = geometric_basket_call(S0, i, r, sigma, t, T, N, rho)
     price_bs = black_scholes_call(np.prod(S0)**(1/N), i, T, t, r, sigma)
     price_control, error_control = mc_arithmetic_basket_control(S0, i, r, sigma, t, T, N, iter, rho)
-    print("Geometric Basket Option Price with K=", i, " Price: ", price_geo)
-    print("Black-Scholes Option Price with K=", i, " Price: ", price_bs)
-    print("Control Variates Basket Option Price with K=", i, " Price: ", price_control, " Error: ", error_control)
+    print("Verification at K=", i, " Price lower bound: ", price_geo,"<=", "Price Arithmetic Control: ", price_control, "<=", "Price Upper bound:", price_bs)
