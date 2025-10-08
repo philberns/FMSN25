@@ -2,7 +2,7 @@ import numpy as np
 
 
 
-def mc_call_heston_upout(S0, K, r, T, t, N, v0, kappa, theta, sigma_v, rho, B, n_steps=100):
+def mc_call_heston_upout(S0, K, r, T, t, N, v0, kappa, theta, sigma_v, rho, B, n_steps=500):
     """
     Monte Carlo pricing using Milstein scheme for variance and Euler on log-scale for stock price.
     This combination is numerically stable and accurate.

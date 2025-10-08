@@ -8,6 +8,8 @@ from mc_arithmetic_basket_antithetic import mc_arithmetic_basket_antithetic
 from mc_arithmetic_basket_control import mc_arithmetic_basket_control
 from mc_call_heston import mc_call_heston_mixed
 from mc_call_opout import mc_call_heston_upout
+from geometric_basket_call import geometric_basket_call
+from mc_arithmetic_basket_crude import mc_arithmetic_basket_crude
 # == Parameters ==
 
 
@@ -42,9 +44,9 @@ S0 = np.ones(N)*100
 rho = 0.6
 sigma = 0.4 
 t = 0
-T= 1
+T= 4
 iter = [1000, 10000, 100000]
-print("\nBasket Option Prices:\n")
+print("\nArithmetic Basket Option Prices:\n")
 for i in K:
     for j in iter:
         pricecrude, errorcrude = mc_arithmetic_basket_crude(S0, i, r, sigma, t, T, N, j, rho)
@@ -100,3 +102,14 @@ heston_price_upout, heston_error_upout = mc_call_heston_upout(
     v0, kappa, theta, sigma_v, rho, B_upout, n_steps=100
 )
 print(f"Heston up-out (Mixed):       {heston_price_upout:.4f} ± {heston_error_upout:.4f}")
+# Example usage
+S0 = 100
+r = 0.02
+sigma = 0.4
+rho = 0.6
+T = 4
+n = 12
+t=0
+for K in [80, 100, 120]:
+    price = geometric_basket_call(S0, K, r, sigma, t, T, n, rho)
+    print(f"K={K}, Price={price:.4f}")

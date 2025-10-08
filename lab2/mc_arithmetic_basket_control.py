@@ -1,5 +1,5 @@
 import numpy as np 
-
+from scipy.stats import norm
 def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
     tau = T - t
     # Construct correlation matrix
@@ -13,20 +13,23 @@ def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
     L = np.linalg.cholesky(sigma_matrix)
     
     # Calculate theoretical price of geometric basket option (control variate)
-    # For geometric basket: σ_geom² = (1/N²) * 1ᵀ Σ 1 where 1 is vector of ones
-    ones = np.ones(N)
-    sigma_geom_squared = (1/N**2) * ones.T @ sigma_matrix @ ones / tau
-    sigma_geom = np.sqrt(sigma_geom_squared)
+    # Match the calculation from geometric_basket_call function
+    weights = np.ones(N) / N
+    sigma_geom_squared_total = tau * sigma**2 * (np.sum(weights**2) + (1 - np.sum(weights**2)) * rho)
     
-    # Adjusted parameters for geometric basket
-    S_geom = np.prod(S0)**(1/N)  # Geometric mean of initial prices
-    r_adj = r - 0.5 * sigma_geom_squared + 0.5 * sigma**2  # Drift adjustment
+    
+    # Geometric mean of initial prices
+    S_geom = np.prod(S0)**(1/N)
     
     # Black-Scholes price for geometric basket (our control variate)
-    from scipy.stats import norm
-    d1 = (np.log(S_geom / K) + (r_adj + 0.5 * sigma_geom**2) * tau) / (sigma_geom * np.sqrt(tau))
-    d2 = d1 - sigma_geom * np.sqrt(tau)
-    control_theoretical = S_geom * norm.cdf(d1) - K * np.exp(-r * tau) * norm.cdf(d2)
+    # Match the calculation from geometric_basket_call function
+    
+    a = np.log(S_geom) + (r - 0.5*sigma**2)*tau
+    b = sigma_geom_squared_total
+    
+    d1 = (a - np.log(K) + b) / np.sqrt(b)
+    d2 = d1 - np.sqrt(b)
+    control_theoretical = np.exp(-r*tau) * (np.exp(a + 0.5*b)*norm.cdf(d1) - K*norm.cdf(d2))
     
     payoffs_arithmetic = []
     payoffs_geometric = []
@@ -60,7 +63,9 @@ def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
         beta_optimal = 0
     
     # Control variate estimator: X̃ = X - β*(Y - E[Y])
-    controlled_payoffs = payoffs_arithmetic - beta_optimal * (payoffs_geometric - control_theoretical)
+    # Note: payoffs are undiscounted, so we need undiscounted theoretical value
+    control_theoretical_undiscounted = control_theoretical * np.exp(r * tau)
+    controlled_payoffs = payoffs_arithmetic - beta_optimal * (payoffs_geometric - control_theoretical_undiscounted)
     
     # Calculate price and error
     price = np.exp(-r * tau) * np.mean(controlled_payoffs)

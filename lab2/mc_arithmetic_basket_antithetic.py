@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.stats import norm
 def mc_arithmetic_basket_antithetic(S0, K, r, sigma, t, T, N, iter, rho):
     tau = T - t
     # Construct correlation matrix

@@ -1,5 +1,5 @@
 import numpy as np 
-
+from scipy.stats import norm
 def mc_arithmetic_basket_crude(S0, K, r, sigma, t, T, N, iter, rho):
     tau = T - t
     # Construct correlation matrix
@@ -11,7 +11,7 @@ def mc_arithmetic_basket_crude(S0, K, r, sigma, t, T, N, iter, rho):
     
     # Cholesky decomposition for correlated random variables
     L = np.linalg.cholesky(sigma_matrix)
-    
+    #print(f"skriv ut L", L)
     payoffs = []  # Store all payoffs
     for i in range(iter):
         Z = np.random.randn(N)
