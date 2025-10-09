@@ -94,17 +94,8 @@ def eln_pricing_at_time_t(NA, participation_rate, c_i, S0_original, S_current, r
     
     tau = T - t  # Remaining time to maturity
     # Modified weights are based on ORIGINAL prices (fixed at inception)
-    weights = c_i / S0_original
+    weights = c_i / S_current
 
-    
-    
-    # Simple approach: Price the ELN payoff from current state to maturity
-    # We simulate B(T)/B(0) starting from current basket level
-    # The payoff is max(B(T)/B(0) - 1, 0)
-    
-    current_basket_value = np.sum(weights * S_current)
-    
-    
     
     # Price basket call with strike K=1 (since we want max(B(T)/B(0) - 1, 0))
     # Starting from current prices, simulating to maturity

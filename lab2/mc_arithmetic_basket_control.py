@@ -1,6 +1,7 @@
 import numpy as np 
 from scipy.stats import norm
 def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
+    
     tau = T - t
     # Construct correlation matrix
     rhomat = np.full([N, N], rho)
@@ -29,7 +30,7 @@ def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
     
     d1 = (a - np.log(K) + b) / np.sqrt(b)
     d2 = d1 - np.sqrt(b)
-    control_theoretical = np.exp(-r*tau) * (np.exp(a + 0.5*b)*norm.cdf(d1) - K*norm.cdf(d2))
+    control_theoretical = (np.exp(a + 0.5*b)*norm.cdf(d1) - K*norm.cdf(d2))
     
     payoffs_arithmetic = []
     payoffs_geometric = []
@@ -51,7 +52,8 @@ def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
     
     payoffs_arithmetic = np.array(payoffs_arithmetic)
     payoffs_geometric = np.array(payoffs_geometric)
-    
+    print(f"Mean payoff (arithmetic): {np.mean(payoffs_arithmetic):.6f}")
+    print(f"Mean payoff (geometric): {np.mean(payoffs_geometric):.6f}")
     # Control variate technique
     # Optimal control coefficient: β* = Cov(X,Y) / Var(Y)
     cov_xy = np.cov(payoffs_arithmetic, payoffs_geometric)[0, 1]
@@ -59,13 +61,14 @@ def mc_arithmetic_basket_control(S0, K, r, sigma, t, T, N, iter, rho):
     
     if var_y > 0:
         beta_optimal = cov_xy / var_y
+        
     else:
         beta_optimal = 0
     
     # Control variate estimator: X̃ = X - β*(Y - E[Y])
     # Note: payoffs are undiscounted, so we need undiscounted theoretical value
-    control_theoretical_undiscounted = control_theoretical * np.exp(r * tau)
-    controlled_payoffs = payoffs_arithmetic - beta_optimal * (payoffs_geometric - control_theoretical_undiscounted)
+    
+    controlled_payoffs = payoffs_arithmetic - beta_optimal * (payoffs_geometric - control_theoretical)
     
     # Calculate price and error
     price = np.exp(-r * tau) * np.mean(controlled_payoffs)
